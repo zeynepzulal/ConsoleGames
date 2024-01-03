@@ -126,11 +126,13 @@ ____
                 HangTheMan(ref hangmanIndex, hangman, ref isGameOn, recreatedWord, secretWord);            // Screen output goes here
                 if (isGameOn == 1 || isGameOn == 0)
                 {
+                    Console.Read();
                     break;
                 }
             }
+            
             return new Score();
-
+            
         }
         static string ReadSecretWord(char[] validChar)
         {
