@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Net.Security;
@@ -33,7 +34,7 @@ namespace ConsoleGames.Games
         // PUBLIC METHODS
         //---------------------------------------------------//
         private int[] diskNumberOfLevels = new int[] { 3, 4, 5, 6 };
-
+        private int?[] maxAttempts = new int?[] { 7, 15, 31, null }; // max nr of attempts per level
 
 
         private class Disk
@@ -67,7 +68,17 @@ namespace ConsoleGames.Games
             score.LevelCompleted = false;
 
             bool levelCompleted = false; // number guessed in at most max attempts
-                                         //Variables
+            int attempts = 0;
+
+            if (level > LevelMax) level = LevelMax;
+            if (maxAttempts.Length != LevelMax || diskNumberOfLevels.Length != LevelMax)
+            {
+                // ensure that settings are consistent
+                throw new Exception();
+            }
+
+
+            //Variables
             int numberOfDisks = 0;
             List<Disk>[] rods = new[]{
                new List<Disk>{},
@@ -90,12 +101,13 @@ namespace ConsoleGames.Games
                 int toWhichRod = 0;
 
                 ViewDisk(rods, maxWidthOfTheRod, heightOfTheRod);
-                MoveTo(rods, ref validRodNum, ref fromWhichRod, ref toWhichRod);
+                MoveTo(rods, ref validRodNum, ref fromWhichRod, ref toWhichRod, ref attempts);
 
-                if (HaveYouSucceeded(rods, ref numberOfDisks, ref level, ref levelCompleted, maxWidthOfTheRod, LevelMax, heightOfTheRod))
+                if (HaveYouSucceeded(rods, ref numberOfDisks, ref level, ref levelCompleted, maxWidthOfTheRod, LevelMax, heightOfTheRod, ref attempts))
                 {
                     score.LevelCompleted = levelCompleted;
                     score.Level = level;
+                    score.Points = attempts;
                     break;
                 }
 
@@ -195,7 +207,7 @@ namespace ConsoleGames.Games
             }
 
         }
-        private void MoveTo(List<Disk>[] rods, ref int[] validRodNum, ref int fromWhichRod, ref int toWhichRod)
+        private void MoveTo(List<Disk>[] rods, ref int[] validRodNum, ref int fromWhichRod, ref int toWhichRod, ref int attempts)
 
         {
 
@@ -302,6 +314,7 @@ namespace ConsoleGames.Games
             var theMovingDisk = rods[fromWhichRod - 1].LastOrDefault(); //tipi disk
             rods[fromWhichRod - 1].RemoveAt(rods[fromWhichRod - 1].Count - 1); // tipi int olmali
             rods[toWhichRod - 1].Add(theMovingDisk);
+            attempts++;
             Console.Clear();
 
         }
@@ -382,30 +395,36 @@ namespace ConsoleGames.Games
                 rods[0].Insert(0, new Disk((i + 1) * 2, colors[i])); // Her disk boyutunu artırarak ekliyoruz
             }
         }
-        private bool HaveYouSucceeded(List<Disk>[] rods, ref int numberOfDisk, ref int level, ref bool levelCompleted, int maxWidthOfRod, int LevelMax, int heightOfTheRod)
+        private bool HaveYouSucceeded(List<Disk>[] rods, ref int numberOfDisk, ref int level, ref bool levelCompleted, int maxWidthOfRod, int LevelMax, int heightOfTheRod, ref int attempts)
         {
             if (rods[1].Count == numberOfDisk || rods[2].Count == numberOfDisk)
             {
                 ViewDisk(rods, maxWidthOfRod, heightOfTheRod);
 
-                levelCompleted = true;
+                if (attempts <= maxAttempts[level - 1])
+                {
+                    levelCompleted = true;
+                }
+                if (level == LevelMax) levelCompleted = true;
 
-
-                if (level <= LevelMax)
+                Console.WriteLine("Dafür hast du " + attempts + " Versuche benötigst");
+                if (level < LevelMax)
                 {
                     if (levelCompleted)
                     {
                         Console.WriteLine("Gratuliere, du hast das Level erfolgreich absolviert.");
-
                     }
                     else
                     {
-                        Console.WriteLine("Leider.");
+                        Console.WriteLine("Leider hat du zu viele Versuche benötigt, um das Level zu bestehen.");
                     }
-
-                    Console.WriteLine("Drücke irgend eine Taste um fortzufahren.");
-                    Console.ReadKey();
                 }
+                else // already in highest level
+                {
+                    Console.WriteLine("Du hast bereits das höchste Level erreicht. Versuche, dieses in möglichst wenigen Schritten zu absolvieren.");
+                }
+                Console.WriteLine("Drücke irgend eine Taste um fortzufahren.");
+                Console.ReadKey();
 
                 return true;
             }
