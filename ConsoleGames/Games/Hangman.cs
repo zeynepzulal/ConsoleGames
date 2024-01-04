@@ -126,11 +126,11 @@ ____
                 HangTheMan(ref hangmanIndex, hangman, ref isGameOn, recreatedWord, secretWord);            // Screen output goes here
                 if (isGameOn == 1 || isGameOn == 0)
                 {
-                    Console.Read();
+                    
                     break;
                 }
             }
-            
+            Console.Read();
             return new Score();
             
         }
@@ -210,13 +210,16 @@ ____
         static void HangTheMan(ref int indexHangman, string[] Man, ref int Status, string recreatedWord, string word)
         {
             if (Status == 1)
-            {
-                Console.WriteLine("You won!");
+            {   
+                Console.WriteLine("You won!"); 
+                
             }
             if (Status == 0)
             {
                 Console.WriteLine("You lost! Secret word was " + word);
+               
             }
+            
             Console.WriteLine(Man[indexHangman]);
             Console.WriteLine(recreatedWord);
         }

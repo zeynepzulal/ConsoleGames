@@ -14,7 +14,8 @@ namespace ConsoleGames.Games
         // PUBLIC PROPERTIES (Eigenschaften)
         public override string Name => "Hanoi Tower";
         public override string Description => "The objective of the game is to shift the entire stack of disks from one rod to another rod ";
-        public override string Rules => " 1) Only one disk can be moved at a time.\n " +
+        public override string Rules => " " +
+            "1) Only one disk can be moved at a time.\n " +
             "2) Only the uppermost disk from one stack can be moved on to the top of another stack or an empty rod.\n " +
             "3) Larger disks cannot be placed on the top of smaller disks";
         public override string Credits => "Zeynep Keskin, zekeskin@ksr.ch";
@@ -35,7 +36,7 @@ namespace ConsoleGames.Games
 
 
 
-        public class Disk
+        private class Disk
         {
 
             public int size;
@@ -47,19 +48,6 @@ namespace ConsoleGames.Games
 
             }
         }
-        //Variables
-        int numberOfDisks;
-        List<Disk>[] rods = new[]{
-               new List<Disk>{},
-               new List<Disk>{},
-               new List<Disk>{}
-        };
-
-
-        int maxWidthOfTheRod = 21;
-        int heightOfTheRod = 10;
-
-        int[] validRodNum = new int[3] { 1, 2, 3 };
 
         /// <summary>
         /// Public method <c>Play</c> that is called by framework (in Program.cs) to start the game.
@@ -79,6 +67,19 @@ namespace ConsoleGames.Games
             score.LevelCompleted = false;
 
             bool levelCompleted = false; // number guessed in at most max attempts
+                                         //Variables
+            int numberOfDisks = 0;
+            List<Disk>[] rods = new[]{
+               new List<Disk>{},
+               new List<Disk>{},
+               new List<Disk>{}
+        };
+
+
+            int maxWidthOfTheRod = 21;
+            int heightOfTheRod = 10;
+
+            int[] validRodNum = new int[3] { 1, 2, 3 };
 
 
 
@@ -88,7 +89,7 @@ namespace ConsoleGames.Games
                 int fromWhichRod = 0;
                 int toWhichRod = 0;
 
-                ViewDisk(rods, maxWidthOfTheRod, ref numberOfDisks, heightOfTheRod);
+                ViewDisk(rods, maxWidthOfTheRod, heightOfTheRod);
                 MoveTo(rods, ref validRodNum, ref fromWhichRod, ref toWhichRod);
 
                 if (HaveYouSucceeded(rods, ref numberOfDisks, ref level, ref levelCompleted, maxWidthOfTheRod, LevelMax, heightOfTheRod))
@@ -97,7 +98,7 @@ namespace ConsoleGames.Games
                     score.Level = level;
                     break;
                 }
-                
+
             }
 
             return score;
@@ -128,7 +129,7 @@ namespace ConsoleGames.Games
         /// </returns>
 
 
-        static void ViewDisk(List<Disk>[] rods, int maxWidthOfRod, ref int numberOfDisk, int heightOfRod)
+        private void ViewDisk(List<Disk>[] rods, int maxWidthOfRod, int heightOfRod)
         {
             for (int j = heightOfRod - 1; j >= 0; j--) // 10 == cubugun uzunlugu, eksi bir koymazsak 11 oluyor o yüzden -1 koydum
             {
@@ -189,12 +190,12 @@ namespace ConsoleGames.Games
                 }
 
                 Console.WriteLine();
-                
+
 
             }
 
         }
-        static void MoveTo(List<Disk>[] rods, ref int[] validRodNum, ref int fromWhichRod, ref int toWhichRod)
+        private void MoveTo(List<Disk>[] rods, ref int[] validRodNum, ref int fromWhichRod, ref int toWhichRod)
 
         {
 
@@ -304,7 +305,7 @@ namespace ConsoleGames.Games
             Console.Clear();
 
         }
-        static bool FindMax(List<Disk>[] rods, int lastDisk)
+        private bool FindMax(List<Disk>[] rods, int lastDisk)
         {
             int maxSize = 0;
             List<int> sizes = new List<int> { };
@@ -351,10 +352,10 @@ namespace ConsoleGames.Games
             {
                 numberOfDisk = diskNumberOfLevels[3];
             }
-            AddDisk(rods, numberOfDisks);
+            AddDisk(rods,ref numberOfDisk);
 
         }
-        static void AddDisk(List<Disk>[] rods, int numberOfDisks)
+        private void AddDisk(List<Disk>[] rods, ref int numberOfDisks)
         {
             foreach (var rod in rods)
             {
@@ -381,16 +382,16 @@ namespace ConsoleGames.Games
                 rods[0].Insert(0, new Disk((i + 1) * 2, colors[i])); // Her disk boyutunu artırarak ekliyoruz
             }
         }
-        static bool HaveYouSucceeded(List<Disk>[] rods, ref int numberOfDisk, ref int level, ref bool levelCompleted, int maxWidthOfRod, int LevelMax, int heightOfTheRod)
+        private bool HaveYouSucceeded(List<Disk>[] rods, ref int numberOfDisk, ref int level, ref bool levelCompleted, int maxWidthOfRod, int LevelMax, int heightOfTheRod)
         {
             if (rods[1].Count == numberOfDisk || rods[2].Count == numberOfDisk)
             {
-                ViewDisk(rods, maxWidthOfRod, ref numberOfDisk, heightOfTheRod);
+                ViewDisk(rods, maxWidthOfRod, heightOfTheRod);
 
                 levelCompleted = true;
 
 
-                if (level < LevelMax)
+                if (level <= LevelMax)
                 {
                     if (levelCompleted)
                     {
