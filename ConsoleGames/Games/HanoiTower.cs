@@ -36,7 +36,7 @@ namespace ConsoleGames.Games
         // PUBLIC METHODS
         //---------------------------------------------------//
         private int[] diskNumberOfLevels = new int[] { 3, 4, 5, 6 };
-        private int?[] maxAttempts = new int?[] { 7, 15, 31, null }; // max nr of attempts per level
+        private int?[] maxNumberOfMoves = new int?[] { 7, 15, null, null }; // max nr of attempts per level
 
 
         private class Disk
@@ -68,17 +68,15 @@ namespace ConsoleGames.Games
 
             Score score = new Score();
             score.LevelCompleted = false;
-
-            bool levelCompleted = false; // number guessed in at most max attempts
-            int attempts = 0;
+            bool levelCompleted = false;
+            int numberOfMoves = 0;
 
             if (level > LevelMax) level = LevelMax;
-            if (maxAttempts.Length != LevelMax || diskNumberOfLevels.Length != LevelMax)
+            if (maxNumberOfMoves.Length != LevelMax || diskNumberOfLevels.Length != LevelMax)
             {
                 // ensure that settings are consistent
                 throw new Exception();
             }
-
 
             //Variables
             int numberOfDisks = 0;
@@ -86,15 +84,10 @@ namespace ConsoleGames.Games
                new List<Disk>{},
                new List<Disk>{},
                new List<Disk>{}
-        };
-
-
+            };
             int maxWidthOfTheRod = 21;
             int heightOfTheRod = 10;
-
             int[] validRodNum = new int[3] { 1, 2, 3 };
-
-
 
             DisplayInitial(ref level, ref numberOfDisks, rods);
             while (true)
@@ -103,24 +96,18 @@ namespace ConsoleGames.Games
                 int toWhichRod = 0;
 
                 ViewDisk(rods, maxWidthOfTheRod, heightOfTheRod);
-                MoveTo(rods, ref validRodNum, ref fromWhichRod, ref toWhichRod, ref attempts);
+                MoveTo(rods, ref validRodNum, ref fromWhichRod, ref toWhichRod, ref numberOfMoves);
 
-                if (HaveYouSucceeded(rods, ref numberOfDisks, ref level, ref levelCompleted, maxWidthOfTheRod, LevelMax, heightOfTheRod, ref attempts))
+                if (HaveYouSucceeded(rods, ref numberOfDisks, ref level, ref levelCompleted, maxWidthOfTheRod, LevelMax, heightOfTheRod, ref numberOfMoves))
                 {
                     score.LevelCompleted = levelCompleted;
                     score.Level = level;
-                    score.Points = attempts;
+                    score.Points = numberOfMoves;
                     break;
                 }
-
             }
-
             return score;
-
-
         }
-
-
         //---------------------------------------------------//
         // PRIVATE METHODS FOR MODEL
         //---------------------------------------------------//
@@ -142,24 +129,22 @@ namespace ConsoleGames.Games
         /// int with value -1 (guess too small), 0 (correct guess) or 1 (guess too big)
         /// </returns>
 
-
         private void ViewDisk(List<Disk>[] rods, int maxWidthOfRod, int heightOfRod)
         {
-            for (int j = heightOfRod - 1; j >= 0; j--) // 10 == cubugun uzunlugu, eksi bir koymazsak 11 oluyor o yüzden -1 koydum
-            {
-                for (int i = 0; i < rods.Length; i++) //rods.length =3 cubuk var
+            for (int j = heightOfRod - 1; j >= 0; j--) {  // 10 == height of rod
+                for (int i = 0; i < rods.Length; i++) //rods.length = 3 (there are 3 rods)
                 {
                     var rod = rods[i];
 
-                    if (j >= rod.Count) // cubugun uzunlugu yani 10 > 3, 9>3 8> ----- yani 10 kere bu saarti saglarsa for döngüsünde belirlendigi gibi 10 kere | koycak
-                    {// cubugun 10>3  9>3  8>3  7>3  6>3   5>3  4>3  3>3 buraya kadar sadece cubuk komur. 2<3 olduguna asagidaki else olusur
+                    if (j >= rod.Count) // for the first level: 10>3  9>3  8>3  7>3  6>3   5>3  4>3  3> 3 until here just puts 7 part of the rod " | " . 
+                    {
                         Console.Write(new String(' ', maxWidthOfRod / 2));
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write("|");
                         Console.Write(new String(' ', maxWidthOfRod / 2));
 
                     }
-                    else // 2<3  1<3 0<3   diger üc |  cizgi ve 3 disk bu else ile konur
+                    else // for the first level: 2<3  1<3 0<3  and here puts other 3 part of the rod " | "  and  3 disk
                     {
                         var disk = rod[j];  // rods[0][10] =  disk(2, sari), 0,9.. 0,8 .....1,10 ..1,8.... 1,2 .... 2,10 ....2,2 ...2,1 2,0
                         int emptySpaces = (maxWidthOfRod - disk.size) / 2;
@@ -209,15 +194,12 @@ namespace ConsoleGames.Games
             }
 
         }
-        private void MoveTo(List<Disk>[] rods, ref int[] validRodNum, ref int fromWhichRod, ref int toWhichRod, ref int attempts)
+        private void MoveTo(List<Disk>[] rods, ref int[] validRodNum, ref int fromWhichRod, ref int toWhichRod, ref int numberOfMoves)
 
         {
-
             while (true)
             {
-
                 Console.WriteLine("From which rod do you want to move the disc ? (1, 2 or 3)");
-
                 fromWhichRod = int.Parse(Console.ReadLine());
 
                 if (!validRodNum.Contains(fromWhichRod))
@@ -232,24 +214,23 @@ namespace ConsoleGames.Games
                 }
                 if (FindMax(rods, rods[fromWhichRod - 1].Last().size) && rods[1].Count != 0 && rods[2].Count != 0 && rods[0].Count != 0)
                 {
-                    Console.WriteLine("This is the biggest disk, you cant move this rigt now to anywhere! ");
+                    Console.WriteLine("This is the biggest disk, you can't move this to anywhere right now! ");
                     continue;
                 }
                 if (fromWhichRod == 1 && rods[0].Count != 0 && rods[1].Count != 0 && rods[2].Count != 0)
                 {
                     if (rods[fromWhichRod - 1].Last().size > rods[1].Last().size && rods[fromWhichRod - 1].Last().size > rods[2].Last().size)
                     {
-                        Console.WriteLine("You canr move this disk to anywhere rigth now!");
+                        Console.WriteLine("Right now, you can't move this disc anywhere !");
                         continue;
                     }
                     else { break; }
-
                 }
                 if (fromWhichRod == 2 && rods[0].Count != 0 && rods[1].Count != 0 && rods[2].Count != 0)
                 {
                     if (rods[fromWhichRod - 1].Last().size > rods[0].Last().size && rods[fromWhichRod - 1].Last().size > rods[2].Last().size)
                     {
-                        Console.WriteLine("You canr move this disk to anywhere rigth now!");
+                        Console.WriteLine("Right now, you can't move this disc anywhere !");
                         continue;
                     }
                     else { break; }
@@ -258,24 +239,11 @@ namespace ConsoleGames.Games
                 {
                     if (rods[fromWhichRod - 1].Last().size > rods[0].Last().size && rods[fromWhichRod - 1].Last().size > rods[1].Last().size)
                     {
-                        Console.WriteLine("You canr move this disk to anywhere rigth now!");
+                        Console.WriteLine("Right now ,you can't move this disc anywhere !");
                         continue;
                     }
                     else { break; }
                 }
-                /* if (rods[toWhichRod - 1].Count != 0)
-                 {
-                     if (rods[fromWhichRod - 1].Last().size > rods[0].Last().size &&
-                         rods[fromWhichRod - 1].Last().size > rods[1].Last().size && rods[fromWhichRod - 1].Last().size > rods[2].Last().size)
-                     {
-                         Console.WriteLine("You cant move this disk rigth now to anywhere!");
-                         continue;
-                     }
-                     else
-                     {
-                         break;
-                     }
-                 }*/
                 else
                 {
                     break;
@@ -298,31 +266,22 @@ namespace ConsoleGames.Games
                         Console.WriteLine("You cant put a larger disk on a smaller disk! Choose a smaller disk to put on it.");
                         continue;
                     }
-
-                    else
-                    {
-                        break;
-                    }
+                    else { break;}
                 }
                 else
                 {
                     break;
-
                 }
-
-
             }
 
-            var theMovingDisk = rods[fromWhichRod - 1].LastOrDefault(); //tipi disk
-            rods[fromWhichRod - 1].RemoveAt(rods[fromWhichRod - 1].Count - 1); // tipi int olmali
+            var theMovingDisk = rods[fromWhichRod - 1].LastOrDefault(); //type =  disk object
+            rods[fromWhichRod - 1].RemoveAt(rods[fromWhichRod - 1].Count - 1); // RemoveAt() takes number as parameter.
             rods[toWhichRod - 1].Add(theMovingDisk);
             if(fromWhichRod != toWhichRod)
             {  
-                attempts++;
+                numberOfMoves++;
             }
-          
             Console.Clear();
-
         }
         private bool FindMax(List<Disk>[] rods, int lastDisk)
         {
@@ -342,39 +301,34 @@ namespace ConsoleGames.Games
                     maxSize = sizes[i];
                 }
             }
-            //Console.WriteLine(maxSize);
             if (maxSize == lastDisk)
             {
                 return true;
             }
             return false;
         }
-        private void DisplayInitial(ref int level, ref int numberOfDisk, List<Disk>[] rods)
+        private void DisplayInitial(ref int level, ref int numberOfDisks, List<Disk>[] rods)
         {
             Console.WriteLine( "The aim of the game is to slide the entire stack of discs from one stick to the other stick. But be careful, you should do it in as few attempts as possible! \n\n" +
             "PS: If you give up on the disc you want to move, move it back to the same rod. This will not count as an attempt.");
 
             if (level == 1)
             {
-                numberOfDisk = diskNumberOfLevels[0];
-
+                numberOfDisks = diskNumberOfLevels[0];
             }
             if (level == 2)
             {
-                numberOfDisk = diskNumberOfLevels[1];
-
+                numberOfDisks = diskNumberOfLevels[1];
             }
             if (level == 3)
             {
-                numberOfDisk = diskNumberOfLevels[2];
-
+                numberOfDisks = diskNumberOfLevels[2];
             }
             if (level == 4)
             {
-                numberOfDisk = diskNumberOfLevels[3];
+                numberOfDisks = diskNumberOfLevels[3];
             }
-            AddDisk(rods,ref numberOfDisk);
-
+            AddDisk(rods,ref numberOfDisks);
         }
         private void AddDisk(List<Disk>[] rods, ref int numberOfDisks)
         {
@@ -382,13 +336,9 @@ namespace ConsoleGames.Games
             {
                 rod.Clear();
             }
-
             for (int i = 0; i < numberOfDisks; i++)
             {
-
                 string[] colors = { "blue", "cyan", "magenta", "red", "green", "yellow" };
-
-
                 List<string> randomColors = new List<string>();
                 for (int j = 0; j < numberOfDisks; j++)
                 {
@@ -397,39 +347,33 @@ namespace ConsoleGames.Games
                     {
                         randomColors.Add(randomColor);
                     }
-
                 }
-
                 rods[0].Insert(0, new Disk((i + 1) * 2, colors[i])); // Her disk boyutunu artırarak ekliyoruz
             }
         }
-        private bool HaveYouSucceeded(List<Disk>[] rods, ref int numberOfDisk, ref int level, ref bool levelCompleted, int maxWidthOfRod, int LevelMax, int heightOfTheRod, ref int attempts)
+        private bool HaveYouSucceeded(List<Disk>[] rods, ref int numberOfDisks, ref int level, ref bool levelCompleted, int maxWidthOfRod, int LevelMax, int heightOfTheRod, ref int numberOfMoves)
         {
-            if (rods[1].Count == numberOfDisk || rods[2].Count == numberOfDisk)
+            if (rods[1].Count == numberOfDisks || rods[2].Count == numberOfDisks)
             {
                 ViewDisk(rods, maxWidthOfRod, heightOfTheRod);
 
-                if (attempts <= maxAttempts[level - 1])
+                if (numberOfMoves <= maxNumberOfMoves[level - 1])
                 {
                     levelCompleted = true;
                 }
                 if (level == LevelMax) levelCompleted = true;
 
-                Console.WriteLine("Dafür hast du " + attempts + " Versuche benötigst");
+                Console.WriteLine("You needed " + numberOfMoves + " moves for that");
                 if (level < LevelMax)
                 {
                     if (levelCompleted)
                     {
-                        Console.WriteLine("Gratuliere, du hast das Level erfolgreich absolviert.");
+                        Console.WriteLine("Congrats, you passed this level successfully.");
                     }
                     else
                     {
-                        Console.WriteLine("Leider hat du zu viele Versuche benötigt, um das Level zu bestehen.");
+                        Console.WriteLine("Unfortunately, it took you too many attempts to pass the level.");
                     }
-                }
-                else // already in highest level
-                {
-                    Console.WriteLine("Du hast bereits das höchste Level erreicht. Versuche, dieses in möglichst wenigen Schritten zu absolvieren.");
                 }
                 Console.WriteLine("Drücke irgend eine Taste um fortzufahren.");
                 Console.ReadKey();
@@ -439,11 +383,5 @@ namespace ConsoleGames.Games
             return false;
         }
 
-
-
-
-
     }
-
-
 }
