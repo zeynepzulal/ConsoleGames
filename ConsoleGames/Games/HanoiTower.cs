@@ -14,11 +14,13 @@ namespace ConsoleGames.Games
     {
         // PUBLIC PROPERTIES (Eigenschaften)
         public override string Name => "Hanoi Tower";
-        public override string Description => "The objective of the game is to shift the entire stack of disks from one rod to another rod ";
+        public override string Description => "The aim of the game is to slide the entire stack of discs from one stick to the other stick. But be careful, you should do it in as few attempts as possible! \n\n" +
+            "PS: If you give up on the disc you want to move, move it back to the same rod. This will not count as an attempt.";
         public override string Rules => " " +
             "1) Only one disk can be moved at a time.\n " +
             "2) Only the uppermost disk from one stack can be moved on to the top of another stack or an empty rod.\n " +
-            "3) Larger disks cannot be placed on the top of smaller disks";
+            "3) Larger disks cannot be placed on the top of smaller disks"
+            ;
         public override string Credits => "Zeynep Keskin, zekeskin@ksr.ch";
         public override int Year => 2024;
         public override bool TheHigherTheBetter => false;
@@ -314,7 +316,11 @@ namespace ConsoleGames.Games
             var theMovingDisk = rods[fromWhichRod - 1].LastOrDefault(); //tipi disk
             rods[fromWhichRod - 1].RemoveAt(rods[fromWhichRod - 1].Count - 1); // tipi int olmali
             rods[toWhichRod - 1].Add(theMovingDisk);
-            attempts++;
+            if(fromWhichRod != toWhichRod)
+            {  
+                attempts++;
+            }
+          
             Console.Clear();
 
         }
@@ -345,6 +351,8 @@ namespace ConsoleGames.Games
         }
         private void DisplayInitial(ref int level, ref int numberOfDisk, List<Disk>[] rods)
         {
+            Console.WriteLine( "The aim of the game is to slide the entire stack of discs from one stick to the other stick. But be careful, you should do it in as few attempts as possible! \n\n" +
+            "PS: If you give up on the disc you want to move, move it back to the same rod. This will not count as an attempt.");
 
             if (level == 1)
             {
