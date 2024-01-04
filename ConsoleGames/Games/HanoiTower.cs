@@ -97,8 +97,9 @@ namespace ConsoleGames.Games
                     score.Level = level;
                     break;
                 }
-                Console.Clear();
+                
             }
+
             return score;
 
 
@@ -188,6 +189,7 @@ namespace ConsoleGames.Games
                 }
 
                 Console.WriteLine();
+                
 
             }
 
@@ -299,7 +301,7 @@ namespace ConsoleGames.Games
             var theMovingDisk = rods[fromWhichRod - 1].LastOrDefault(); //tipi disk
             rods[fromWhichRod - 1].RemoveAt(rods[fromWhichRod - 1].Count - 1); // tipi int olmali
             rods[toWhichRod - 1].Add(theMovingDisk);
-
+            Console.Clear();
 
         }
         static bool FindMax(List<Disk>[] rods, int lastDisk)
@@ -383,7 +385,6 @@ namespace ConsoleGames.Games
         {
             if (rods[1].Count == numberOfDisk || rods[2].Count == numberOfDisk)
             {
-                Console.Clear();
                 ViewDisk(rods, maxWidthOfRod, ref numberOfDisk, heightOfTheRod);
 
                 levelCompleted = true;
@@ -400,6 +401,9 @@ namespace ConsoleGames.Games
                     {
                         Console.WriteLine("Leider.");
                     }
+
+                    Console.WriteLine("Drücke irgend eine Taste um fortzufahren.");
+                    Console.ReadKey();
                 }
 
                 return true;
