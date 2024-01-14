@@ -7,6 +7,7 @@ using System.Net.Security;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace ConsoleGames.Games
 {
@@ -91,20 +92,20 @@ namespace ConsoleGames.Games
 
             DisplayInitial(ref level, ref numberOfDisks, rods);
             while (true)
-            {
+            { 
                 int fromWhichRod = 0;
                 int toWhichRod = 0;
 
                 ViewDisk(rods, maxWidthOfTheRod, heightOfTheRod);
-                MoveTo(rods, ref validRodNum, ref fromWhichRod, ref toWhichRod, ref numberOfMoves);
+                MoveTo(rods, validRodNum, ref fromWhichRod, ref toWhichRod, ref numberOfMoves);
 
-                if (HaveYouSucceeded(rods, ref numberOfDisks, ref level, ref levelCompleted, maxWidthOfTheRod, LevelMax, heightOfTheRod, ref numberOfMoves))
+                if (HaveYouSucceeded(rods, numberOfDisks, level, ref levelCompleted, maxWidthOfTheRod, LevelMax, heightOfTheRod, numberOfMoves))
                 {
                     score.LevelCompleted = levelCompleted;
                     score.Level = level;
                     score.Points = numberOfMoves;
                     break;
-                }
+                }   
             }
             return score;
         }
@@ -194,7 +195,7 @@ namespace ConsoleGames.Games
             }
 
         }
-        private void MoveTo(List<Disk>[] rods, ref int[] validRodNum, ref int fromWhichRod, ref int toWhichRod, ref int numberOfMoves)
+        private void MoveTo(List<Disk>[] rods, int[] validRodNum, ref int fromWhichRod, ref int toWhichRod, ref int numberOfMoves)
 
         {
             while (true)
@@ -312,25 +313,12 @@ namespace ConsoleGames.Games
             Console.WriteLine( "The aim of the game is to slide the entire stack of discs from one stick to the other stick. But be careful, you should do it in as few attempts as possible! \n\n" +
             "PS: If you give up on the disc you want to move, move it back to the same rod. This will not count as an attempt.");
 
-            if (level == 1)
-            {
-                numberOfDisks = diskNumberOfLevels[0];
-            }
-            if (level == 2)
-            {
-                numberOfDisks = diskNumberOfLevels[1];
-            }
-            if (level == 3)
-            {
-                numberOfDisks = diskNumberOfLevels[2];
-            }
-            if (level == 4)
-            {
-                numberOfDisks = diskNumberOfLevels[3];
-            }
-            AddDisk(rods,ref numberOfDisks);
+
+            numberOfDisks = diskNumberOfLevels[level - 1];
+         
+            AddDisk(rods, numberOfDisks);
         }
-        private void AddDisk(List<Disk>[] rods, ref int numberOfDisks)
+        private void AddDisk(List<Disk>[] rods,  int numberOfDisks)
         {
             foreach (var rod in rods)
             {
@@ -339,19 +327,10 @@ namespace ConsoleGames.Games
             for (int i = 0; i < numberOfDisks; i++)
             {
                 string[] colors = { "blue", "cyan", "magenta", "red", "green", "yellow" };
-                List<string> randomColors = new List<string>();
-                for (int j = 0; j < numberOfDisks; j++)
-                {
-                    string randomColor = colors[j];
-                    if (!randomColors.Contains(randomColor))
-                    {
-                        randomColors.Add(randomColor);
-                    }
-                }
-                rods[0].Insert(0, new Disk((i + 1) * 2, colors[i])); // Her disk boyutunu artırarak ekliyoruz
+                rods[0].Insert(0, new Disk((i + 1) * 2, colors[i])); 
             }
         }
-        private bool HaveYouSucceeded(List<Disk>[] rods, ref int numberOfDisks, ref int level, ref bool levelCompleted, int maxWidthOfRod, int LevelMax, int heightOfTheRod, ref int numberOfMoves)
+        private bool HaveYouSucceeded(List<Disk>[] rods,  int numberOfDisks,  int level, ref bool levelCompleted, int maxWidthOfRod, int LevelMax, int heightOfTheRod, int numberOfMoves)
         {
             if (rods[1].Count == numberOfDisks || rods[2].Count == numberOfDisks)
             {
